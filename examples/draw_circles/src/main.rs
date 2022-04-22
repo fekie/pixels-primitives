@@ -1,5 +1,6 @@
 use log::error;
 use pixels::{Pixels, SurfaceTexture};
+use pixels_primitives;
 use std::error::Error;
 use winit::dpi::LogicalSize;
 use winit::event::{Event, VirtualKeyCode};
@@ -34,7 +35,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     event_loop.run(move |event, _, control_flow| {
         // Draw the current frame
         if let Event::RedrawRequested(_) = event {
-            //world.draw(pixels.get_frame());
+            pixels_primitives::circle(pixels.get_frame());
             if pixels
                 .render()
                 .map_err(|e| error!("pixels.render() failed: {}", e))

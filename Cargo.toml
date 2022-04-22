@@ -1,5 +1,5 @@
 [package]
-name = "pixels-primitives"
+name = "pixels_primitives"
 version = "0.1.0"
 edition = "2021"
 
