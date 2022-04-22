@@ -10,7 +10,7 @@ pub fn triangle_filled(buffer: &mut [u8]) {
     unimplemented!()
 }
 
-pub fn circle(buffer: &mut [u8]) {
+pub fn circle(buffer: &mut [u8], x: u32, y: u32, radius: u32, color: &[u8]) {
     unimplemented!()
 }
 
