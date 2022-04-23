@@ -2,6 +2,13 @@
 name = "pixels_primitives"
 version = "0.1.0"
 edition = "2021"
+authors = ["Chloe-Woahie <longwelldotpy@gmail.com>"]
+repository = "https://github.com/Chloe-Woahie/pixels-primitives"
+description = "An easy and simple wrapper for lines and simple shapes for the [pixels](https://docs.rs/pixels/latest/pixels/) crate."
+keywords = ["pixels", "graphics", "2d-graphics"]
+categories = ["graphics"]
+readme = "README.md"
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
