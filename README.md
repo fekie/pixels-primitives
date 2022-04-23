@@ -1,6 +1,9 @@
 # pixels-primitives
 Basic operations such as lines and shapes for the [pixels](https://github.com/parasyte/pixels) crate.
 
+# Documentation
+Documentation can be found [here](https://docs.rs/pixels_primitives/0.1.1/pixels_primitives/).
+
 # Usage
 
 ### Cargo
