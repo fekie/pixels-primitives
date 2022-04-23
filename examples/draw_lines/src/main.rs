@@ -17,7 +17,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let window = {
         let size = LogicalSize::new(WIDTH as f64, HEIGHT as f64);
         WindowBuilder::new()
-            .with_title("Circle Example")
+            .with_title("Lines Example")
             .with_inner_size(size)
             .with_min_inner_size(size)
             .build(&event_loop)

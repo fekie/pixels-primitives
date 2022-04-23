@@ -1,4 +1,4 @@
-//! A quick and simple wrapper for lines and simple shapes for the [pixels](https://docs.rs/pixels/latest/pixels/) crate.
+//! An easy and simple wrapper for lines and simple shapes for the [pixels](https://docs.rs/pixels/latest/pixels/) crate.
 
 use std::mem;
 
@@ -178,6 +178,7 @@ pub fn circle(
     outline_width: f64,
     rgba: &[u8; 4],
 ) {
+    // Note that rough_maximum_y will not actually be rendered higher than rough_minimum_y, as we are working in the 4th quadrant
     let canvas_height = frame.len() as i32 / 4 / canvas_width;
     let rough_minimum_y = (center_y - radius) as i32;
     let rough_minimum_x = (center_x - radius) as i32;
@@ -268,17 +269,117 @@ pub fn circle_filled(
     }
 }
 
-//#[warn(missing_docs)]
+/// Draws an outline of a square to a frame of pixels used in the [pixels](https://docs.rs/pixels/latest/pixels/) crate.
+///
+/// # Example
+///
+/// ```no_run
+/// use pixels::{Pixels, SurfaceTexture};
+/// use winit::dpi::LogicalSize;
+/// use winit::event_loop::{EventLoop};
+/// use std::error::Error;
+/// use winit::window::WindowBuilder;
+///
+/// const WIDTH: i32 = 800;
+/// const HEIGHT: i32 = 800;
+///
+/// fn main() -> Result<(), Box<dyn Error>> {
+///     let event_loop = EventLoop::new();
+///     let window = {
+///     let size = LogicalSize::new(WIDTH as f64, HEIGHT as f64);
+///     WindowBuilder::new()
+///         .with_title("Filled Square Example")
+///         .with_inner_size(size)
+///         .with_min_inner_size(size)
+///         .build(&event_loop)
+///         .unwrap()
+///     };
+///
+///     let mut pixels = {
+///         let window_size = window.inner_size();
+///         let surface_texture = SurfaceTexture::new(window_size.width, window_size.height, &window);
+///         Pixels::new(WIDTH as u32, HEIGHT as u32, surface_texture)?
+///     };
+///
+///     pixels_primitives::square(
+///         pixels.get_frame(),
+///         WIDTH,
+///         200.0,
+///         200.0,
+///         100.0,
+///         &[255, 255, 255, 255],
+///     );
+///
+///     // Run your event loop here!
+///
+///     Ok(())
+/// }
+///
+/// ```
+#[warn(missing_docs)]
 pub fn square(
     frame: &mut [u8],
     canvas_width: i32,
     center_x: f64,
     center_y: f64,
     side_length: f64,
-    outline_width: f64,
     rgba: &[u8; 4],
 ) {
-    unimplemented!()
+    // Note that top_right_y will not actually be rendered on the top right of the square, as we are working in the 4th quadrant
+    let bottom_left_x = center_x - (side_length / 2.0);
+    let bottom_left_y = center_y - (side_length / 2.0);
+    let top_right_x = center_x + (side_length / 2.0);
+    let top_right_y = center_y + (side_length / 2.0);
+
+    line(
+        frame,
+        canvas_width,
+        bottom_left_x,
+        bottom_left_y,
+        bottom_left_x,
+        top_right_y,
+        rgba,
+    );
+
+    line(
+        frame,
+        canvas_width,
+        bottom_left_x,
+        bottom_left_y,
+        top_right_x,
+        bottom_left_y,
+        rgba,
+    );
+
+    line(
+        frame,
+        canvas_width,
+        top_right_x,
+        bottom_left_y,
+        top_right_x,
+        top_right_y,
+        rgba,
+    );
+
+    line(
+        frame,
+        canvas_width,
+        top_right_x,
+        bottom_left_y,
+        top_right_x,
+        top_right_y,
+        rgba,
+    );
+
+    line(
+        frame,
+        canvas_width,
+        top_right_x,
+        top_right_y,
+        bottom_left_x,
+        top_right_y,
+        rgba,
+    );
 }
 
 /// Draws a filled square to a frame of pixels used in the [pixels](https://docs.rs/pixels/latest/pixels/) crate.
@@ -300,7 +401,7 @@ pub fn square(
 ///     let window = {
 ///     let size = LogicalSize::new(WIDTH as f64, HEIGHT as f64);
 ///     WindowBuilder::new()
-///         .with_title("Filled Square Example")
+///         .with_title("Square Example")
 ///         .with_inner_size(size)
 ///         .with_min_inner_size(size)
 ///         .build(&event_loop)
@@ -337,6 +438,7 @@ pub fn square_filled(
     side_length: f64,
     rgba: &[u8; 4],
 ) {
+    // Note that rough_maximum_y will not actually be rendered higher than rough_minimum_y, as we are working in the 4th quadrant
     let rough_minimum_y = (center_y - (side_length / 2.0)) as i32;
     let rough_minimum_x = (center_x - (side_length / 2.0)) as i32;
     let rough_maximum_y = (center_y + (side_length / 2.0)) as i32;
