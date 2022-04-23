@@ -461,14 +461,202 @@ pub fn square_filled(
     }
 }
 
+/// Draws an outline of a rectangle to a frame of pixels used in the [pixels](https://docs.rs/pixels/latest/pixels/) crate.
+///
+/// Note: bottom_left_y and top_right_y are only named correctly mathematically. [pixels](https://docs.rs/pixels/latest/pixels/)
+/// renders in the 4th quadrant, so the y values are flipped, with y=0 starting at the top. This means that bottom_left_y is actually
+/// rendered to the top left of the rectangle, and top_right_y is rendered to the bottom right of the triangle.
+///
+/// # Example
+///
+/// ```no_run
+/// use pixels::{Pixels, SurfaceTexture};
+/// use winit::dpi::LogicalSize;
+/// use winit::event_loop::{EventLoop};
+/// use std::error::Error;
+/// use winit::window::WindowBuilder;
+///
+/// const WIDTH: i32 = 800;
+/// const HEIGHT: i32 = 800;
+///
+/// fn main() -> Result<(), Box<dyn Error>> {
+///     let event_loop = EventLoop::new();
+///     let window = {
+///     let size = LogicalSize::new(WIDTH as f64, HEIGHT as f64);
+///     WindowBuilder::new()
+///         .with_title("Rectangle Example")
+///         .with_inner_size(size)
+///         .with_min_inner_size(size)
+///         .build(&event_loop)
+///         .unwrap()
+///     };
+///
+///     let mut pixels = {
+///         let window_size = window.inner_size();
+///         let surface_texture = SurfaceTexture::new(window_size.width, window_size.height, &window);
+///         Pixels::new(WIDTH as u32, HEIGHT as u32, surface_texture)?
+///     };
+///
+///     pixels_primitives::rect(
+///         pixels.get_frame(),
+///         WIDTH,
+///         200,
+///         200,
+///         500,
+///         300,
+///         &[255, 255, 255, 255],
+///     );
+///
+///     // Run your event loop here!
+///
+///     Ok(())
+/// }
+///
+/// ```
 #[warn(missing_docs)]
-pub fn rect(buffer: &mut [u8]) {
-    unimplemented!()
+pub fn rect(
+    frame: &mut [u8],
+    canvas_width: i32,
+    bottom_left_x: i32,
+    bottom_left_y: i32,
+    top_right_x: i32,
+    top_right_y: i32,
+    rgba: &[u8; 4],
+) {
+    line(
+        frame,
+        canvas_width,
+        bottom_left_x as f64,
+        bottom_left_y as f64,
+        bottom_left_x as f64,
+        top_right_y as f64,
+        rgba,
+    );
+
+    line(
+        frame,
+        canvas_width,
+        bottom_left_x as f64,
+        bottom_left_y as f64,
+        top_right_x as f64,
+        bottom_left_y as f64,
+        rgba,
+    );
+
+    line(
+        frame,
+        canvas_width,
+        top_right_x as f64,
+        bottom_left_y as f64,
+        top_right_x as f64,
+        top_right_y as f64,
+        rgba,
+    );
+
+    line(
+        frame,
+        canvas_width,
+        top_right_x as f64,
+        bottom_left_y as f64,
+        top_right_x as f64,
+        top_right_y as f64,
+        rgba,
+    );
+
+    line(
+        frame,
+        canvas_width,
+        top_right_x as f64,
+        top_right_y as f64,
+        bottom_left_x as f64,
+        top_right_y as f64,
+        rgba,
+    );
 }
 
+// TODO: make it so this function works with two arbitrary opposite corners
+
+/// Draws a filled rectangle to a frame of pixels used in the [pixels](https://docs.rs/pixels/latest/pixels/) crate.
+///
+/// Note: bottom_left_y and top_right_y are only named correctly mathematically. [pixels](https://docs.rs/pixels/latest/pixels/)
+/// renders in the 4th quadrant, so the y values are flipped, with y=0 starting at the top. This means that bottom_left_y is actually
+/// rendered to the top left of the rectangle, and top_right_y is rendered to the bottom right of the triangle.
+///
+/// # Example
+///
+/// ```no_run
+/// use pixels::{Pixels, SurfaceTexture};
+/// use winit::dpi::LogicalSize;
+/// use winit::event_loop::{EventLoop};
+/// use std::error::Error;
+/// use winit::window::WindowBuilder;
+///
+/// const WIDTH: i32 = 800;
+/// const HEIGHT: i32 = 800;
+///
+/// fn main() -> Result<(), Box<dyn Error>> {
+///     let event_loop = EventLoop::new();
+///     let window = {
+///     let size = LogicalSize::new(WIDTH as f64, HEIGHT as f64);
+///     WindowBuilder::new()
+///         .with_title("Filled Rectangle Example")
+///         .with_inner_size(size)
+///         .with_min_inner_size(size)
+///         .build(&event_loop)
+///         .unwrap()
+///     };
+///
+///     let mut pixels = {
+///         let window_size = window.inner_size();
+///         let surface_texture = SurfaceTexture::new(window_size.width, window_size.height, &window);
+///         Pixels::new(WIDTH as u32, HEIGHT as u32, surface_texture)?
+///     };
+///
+///     pixels_primitives::rect_filled(
+///         pixels.get_frame(),
+///         WIDTH,
+///         200,
+///         200,
+///         500,
+///         300,
+///         &[255, 255, 255, 255],
+///     );
+///
+///     // Run your event loop here!
+///
+///     Ok(())
+/// }
+///
+/// ```
 #[warn(missing_docs)]
-pub fn rect_filled(buffer: &mut [u8]) {
-    unimplemented!()
+pub fn rect_filled(
+    frame: &mut [u8],
+    canvas_width: i32,
+    bottom_left_x: i32,
+    bottom_left_y: i32,
+    top_right_x: i32,
+    top_right_y: i32,
+    rgba: &[u8; 4],
+) {
+    assert!(
+        bottom_left_x <= top_right_x,
+        "bottom_left_x must be smaller or equal to top_right_x"
+    );
+    assert!(
+        bottom_left_y <= top_right_y,
+        "bottom_left_y must be smaller or equal to top_right_y"
+    );
+    for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
+        let x = i as i32 % canvas_width;
+        let y = i as i32 / canvas_width;
+
+        // dont calculate distance if its not within the bounding box
+        if (x < bottom_left_x) || (x > top_right_x) || (y < bottom_left_y) || (y > top_right_y) {
+            continue;
+        }
+
+        pixel.copy_from_slice(rgba);
+    }
 }
 
 #[inline]
