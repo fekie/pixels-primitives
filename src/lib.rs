@@ -4,7 +4,7 @@ use std::mem;
 
 mod math;
 
-/// Draws a 2d line to a frame of pixels used in the [pixels](https://docs.rs/pixels/latest/pixels/) crate.
+/// Draws a 2d line to a frame of pixels.
 ///
 /// # Example
 ///
@@ -108,19 +108,124 @@ pub fn line(
     }
 }
 
-#[warn(missing_docs)]
-pub fn triangle(buffer: &mut [u8]) {
-    unimplemented!()
+//#[warn(missing_docs)]
+pub fn triangle(
+    frame: &mut [u8],
+    canvas_width: i32,
+    v0x: i32,
+    v0y: i32,
+    v1x: i32,
+    v1y: i32,
+    v2x: i32,
+    v2y: i32,
+    rgba: &[u8; 4],
+) {
+    line(
+        frame,
+        canvas_width,
+        v0x as f64,
+        v0y as f64,
+        v1x as f64,
+        v1y as f64,
+        rgba,
+    );
+
+    line(
+        frame,
+        canvas_width,
+        v1x as f64,
+        v1y as f64,
+        v2x as f64,
+        v2y as f64,
+        rgba,
+    );
+
+    line(
+        frame,
+        canvas_width,
+        v2x as f64,
+        v2y as f64,
+        v0x as f64,
+        v0y as f64,
+        rgba,
+    );
 }
 
-#[warn(missing_docs)]
-pub fn triangle_filled(buffer: &mut [u8]) {
-    unimplemented!()
+// TODO: this does not line up perfectly with a normal triangle and I don't know why.
+// TODO: this can be optimized by using barycentric coordinates instead of line sweeping.
+
+//#[warn(missing_docs)]
+pub fn triangle_filled(
+    frame: &mut [u8],
+    canvas_width: i32,
+    v0x: i32,
+    v0y: i32,
+    v1x: i32,
+    v1y: i32,
+    v2x: i32,
+    v2y: i32,
+    rgba: &[u8; 4],
+) {
+    let (mut mv0x, mut mv0y, mut mv1x, mut mv1y, mut mv2x, mut mv2y) =
+        (v0x, v0y, v1x, v1y, v2x, v2y);
+
+    // bubble sort the vectors by y-height
+    math::simple_bubble_sort_vector_by_y(
+        &mut mv0x, &mut mv0y, &mut mv1x, &mut mv1y, &mut mv2x, &mut mv2y,
+    );
+
+    println!(
+        "{} {} {} {} {} {} ",
+        &mut mv0x, &mut mv0y, &mut mv1x, &mut mv1y, &mut mv2x, &mut mv2y
+    );
+
+    let total_height = (mv2y - mv0y) as f64;
+    // y will start at the lowest vertex y value, and increment by 1 to the middle vertex y value
+    // this makes it so we're only drawing half of the B boundary
+    // each iteration will draw two points, one on the left side and one on the right (for each y value)
+
+    // draws the first "half" of the triangle
+    for y in (mv0y as i32)..=(mv1y as i32) {
+        let segment_height = (mv1y - mv0y) as f64;
+        let alpha = (y - mv0y) as f64 / total_height;
+        let beta = (y - mv0y) as f64 / segment_height;
+
+        let left_point_x = mv0x as f64 + ((mv2x - mv0x) as f64 * alpha);
+        let right_point_x = mv0x as f64 + ((mv1x - mv0x) as f64 * beta);
+
+        line(
+            frame,
+            canvas_width,
+            right_point_x,
+            y as f64,
+            left_point_x,
+            y as f64,
+            rgba,
+        );
+    }
+
+    // draws the second "half" of the triangle
+    for y in (mv1y as i32)..=(mv2y as i32) {
+        let segment_height = (mv2y - mv1y) as f64;
+        let alpha = (y - mv0y) as f64 / total_height;
+        let beta = (y - mv1y) as f64 / segment_height;
+        let left_point_x = mv0x as f64 + ((mv2x - mv0x) as f64 * alpha);
+        let right_point_x = mv1x as f64 + ((mv2x - mv1x) as f64 * beta);
+        line(
+            frame,
+            canvas_width,
+            right_point_x,
+            y as f64,
+            left_point_x,
+            y as f64,
+            rgba,
+        );
+    }
 }
 
 // TODO: this function can be optimized by removing the square root used in the distance function
 
-/// Draws an outline of a circle to a frame of pixels used in the [pixels](https://docs.rs/pixels/latest/pixels/) crate.
+/// Draws an outline of a circle to a frame of pixels.
 ///
 /// # Example
 ///
@@ -197,7 +302,7 @@ pub fn circle(
 
 // TODO: this function can be optimized by removing the square root used in the distance function
 
-/// Draws a filled circle to a frame of pixels used in the [pixels](https://docs.rs/pixels/latest/pixels/) crate.
+/// Draws a filled circle to a frame of pixels.
 ///
 /// # Example
 ///
@@ -269,7 +374,7 @@ pub fn circle_filled(
     }
 }
 
-/// Draws an outline of a square to a frame of pixels used in the [pixels](https://docs.rs/pixels/latest/pixels/) crate.
+/// Draws an outline of a square to a frame of pixels.
 ///
 /// # Example
 ///
@@ -382,7 +487,7 @@ pub fn square(
     );
 }
 
-/// Draws a filled square to a frame of pixels used in the [pixels](https://docs.rs/pixels/latest/pixels/) crate.
+/// Draws a filled square to a frame of pixels.
 ///
 /// # Example
 ///
@@ -461,7 +566,7 @@ pub fn square_filled(
     }
 }
 
-/// Draws an outline of a rectangle to a frame of pixels used in the [pixels](https://docs.rs/pixels/latest/pixels/) crate.
+/// Draws an outline of a rectangle to a frame of pixels.
 ///
 /// Note: bottom_left_y and top_right_y are only named correctly mathematically. [pixels](https://docs.rs/pixels/latest/pixels/)
 /// renders in the 4th quadrant, so the y values are flipped, with y=0 starting at the top. This means that bottom_left_y is actually
@@ -576,7 +681,7 @@ pub fn rect(
 
 // TODO: make it so this function works with two arbitrary opposite corners
 
-/// Draws a filled rectangle to a frame of pixels used in the [pixels](https://docs.rs/pixels/latest/pixels/) crate.
+/// Draws a filled rectangle to a frame of pixels.
 ///
 /// Note: bottom_left_y and top_right_y are only named correctly mathematically. [pixels](https://docs.rs/pixels/latest/pixels/)
 /// renders in the 4th quadrant, so the y values are flipped, with y=0 starting at the top. This means that bottom_left_y is actually
