@@ -17,7 +17,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let window = {
         let size = LogicalSize::new(WIDTH as f64, HEIGHT as f64);
         WindowBuilder::new()
-            .with_title("Hello Pixels")
+            .with_title("Circle Example")
             .with_inner_size(size)
             .with_min_inner_size(size)
             .build(&event_loop)
@@ -30,12 +30,20 @@ fn main() -> Result<(), Box<dyn Error>> {
         Pixels::new(WIDTH, HEIGHT, surface_texture)?
     };
 
-    //let mut world = World::new();
+    // this will run once
+    pixels_primitives::circle(
+        pixels.get_frame(),
+        WIDTH,
+        200.0,
+        200.0,
+        50.0,
+        1.5,
+        &[255, 255, 255, 255],
+    );
 
     event_loop.run(move |event, _, control_flow| {
         // Draw the current frame
         if let Event::RedrawRequested(_) = event {
-            pixels_primitives::circle(pixels.get_frame());
             if pixels
                 .render()
                 .map_err(|e| error!("pixels.render() failed: {}", e))
