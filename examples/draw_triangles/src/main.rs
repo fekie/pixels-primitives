@@ -17,7 +17,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let window = {
         let size = LogicalSize::new(WIDTH as f64, HEIGHT as f64);
         WindowBuilder::new()
-            .with_title("Rectangles Example")
+            .with_title("Triangles Example")
             .with_inner_size(size)
             .with_min_inner_size(size)
             .build(&event_loop)
@@ -30,13 +30,13 @@ fn main() -> Result<(), Box<dyn Error>> {
         Pixels::new(WIDTH as u32, HEIGHT as u32, surface_texture)?
     };
 
-    pixels_primitives::triangle(
+    pixels_primitives::triangle_filled(
         pixels.get_frame(),
         WIDTH,
-        200,
-        400,
+        100,
+        500,
         300,
-        200,
+        50,
         400,
         400,
         &[255, 255, 255, 255],
@@ -49,21 +49,33 @@ fn main() -> Result<(), Box<dyn Error>> {
         500,
         700,
         180,
+        600,
         430,
-        430,
-        &[0, 0, 255, 255],
+        &[255, 0, 0, 255],
+    );
+
+    pixels_primitives::triangle(
+        pixels.get_frame(),
+        WIDTH,
+        -100,
+        500,
+        200,
+        750,
+        500,
+        700,
+        &[0, 255, 0, 255],
     );
 
     pixels_primitives::triangle_filled(
         pixels.get_frame(),
         WIDTH,
-        410,
+        600,
+        600,
+        200,
         500,
+        550,
         700,
-        180,
-        430,
-        430,
-        &[255, 0, 0, 255],
+        &[0, 0, 255, 255],
     );
 
     event_loop.run(move |event, _, control_flow| {

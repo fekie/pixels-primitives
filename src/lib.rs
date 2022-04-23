@@ -108,7 +108,57 @@ pub fn line(
     }
 }
 
-//#[warn(missing_docs)]
+/// Draws an outline of a triangle to a frame of pixels.
+///
+/// # Example
+///
+/// ```no_run
+/// use pixels::{Pixels, SurfaceTexture};
+/// use winit::dpi::LogicalSize;
+/// use winit::event_loop::{EventLoop};
+/// use std::error::Error;
+/// use winit::window::WindowBuilder;
+///
+/// const WIDTH: i32 = 800;
+/// const HEIGHT: i32 = 800;
+///
+/// fn main() -> Result<(), Box<dyn Error>> {
+///     let event_loop = EventLoop::new();
+///     let window = {
+///     let size = LogicalSize::new(WIDTH as f64, HEIGHT as f64);
+///     WindowBuilder::new()
+///         .with_title("Filled Triangle Example")
+///         .with_inner_size(size)
+///         .with_min_inner_size(size)
+///         .build(&event_loop)
+///         .unwrap()
+///     };
+///
+///     let mut pixels = {
+///         let window_size = window.inner_size();
+///         let surface_texture = SurfaceTexture::new(window_size.width, window_size.height, &window);
+///         Pixels::new(WIDTH as u32, HEIGHT as u32, surface_texture)?
+///     };
+///
+///     pixels_primitives::triangle(
+///         pixels.get_frame(),
+///         WIDTH,
+///         410,
+///         500,
+///         700,
+///         180,
+///         430,
+///         430,
+///         &[255, 255, 255, 255],
+///     );
+///
+///     // Run your event loop here!
+///
+///     Ok(())
+/// }
+///
+/// ```
+#[warn(missing_docs)]
 pub fn triangle(
     frame: &mut [u8],
     canvas_width: i32,
@@ -154,7 +204,57 @@ pub fn triangle(
 // TODO: this does not line up perfectly with a normal triangle and I don't know why.
 // TODO: this can be optimized by using barycentric coordinates instead of line sweeping.
 
-//#[warn(missing_docs)]
+/// Draws a filled triangle to a frame of pixels.
+///
+/// # Example
+///
+/// ```no_run
+/// use pixels::{Pixels, SurfaceTexture};
+/// use winit::dpi::LogicalSize;
+/// use winit::event_loop::{EventLoop};
+/// use std::error::Error;
+/// use winit::window::WindowBuilder;
+///
+/// const WIDTH: i32 = 800;
+/// const HEIGHT: i32 = 800;
+///
+/// fn main() -> Result<(), Box<dyn Error>> {
+///     let event_loop = EventLoop::new();
+///     let window = {
+///     let size = LogicalSize::new(WIDTH as f64, HEIGHT as f64);
+///     WindowBuilder::new()
+///         .with_title("Filled Triangle Example")
+///         .with_inner_size(size)
+///         .with_min_inner_size(size)
+///         .build(&event_loop)
+///         .unwrap()
+///     };
+///
+///     let mut pixels = {
+///         let window_size = window.inner_size();
+///         let surface_texture = SurfaceTexture::new(window_size.width, window_size.height, &window);
+///         Pixels::new(WIDTH as u32, HEIGHT as u32, surface_texture)?
+///     };
+///
+///     pixels_primitives::triangle_filled(
+///         pixels.get_frame(),
+///         WIDTH,
+///         410,
+///         500,
+///         700,
+///         180,
+///         430,
+///         430,
+///         &[255, 255, 255, 255],
+///     );
+///
+///     // Run your event loop here!
+///
+///     Ok(())
+/// }
+///
+/// ```
+#[warn(missing_docs)]
 pub fn triangle_filled(
     frame: &mut [u8],
     canvas_width: i32,
@@ -172,11 +272,6 @@ pub fn triangle_filled(
     // bubble sort the vectors by y-height
     math::simple_bubble_sort_vector_by_y(
         &mut mv0x, &mut mv0y, &mut mv1x, &mut mv1y, &mut mv2x, &mut mv2y,
-    );
-
-    println!(
-        "{} {} {} {} {} {} ",
-        &mut mv0x, &mut mv0y, &mut mv1x, &mut mv1y, &mut mv2x, &mut mv2y
     );
 
     let total_height = (mv2y - mv0y) as f64;
