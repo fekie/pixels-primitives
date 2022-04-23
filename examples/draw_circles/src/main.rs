@@ -31,13 +31,21 @@ fn main() -> Result<(), Box<dyn Error>> {
     };
 
     // this will run once
-    pixels_primitives::circle(
+    /* pixels_primitives::circle(
         pixels.get_frame(),
         WIDTH,
         200.0,
         200.0,
         50.0,
         1.5,
+        &[255, 255, 255, 255],
+    ); */
+    pixels_primitives::circle_filled(
+        pixels.get_frame(),
+        WIDTH,
+        200.0,
+        200.0,
+        50.0,
         &[255, 255, 255, 255],
     );
 
