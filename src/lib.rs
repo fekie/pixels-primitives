@@ -14,6 +14,8 @@ pub fn line(
     ending_y: f64,
     rgba: &[u8; 4],
 ) {
+    let height = frame.len() as i32 / 4 / width;
+
     // Clone our immutable values into mutable values.
     let (mut mx0, mut my0, mut mx1, mut my1) = (
         starting_x as i32,
@@ -43,14 +45,12 @@ pub fn line(
     let error_increment2 = dy.abs() * 2;
     let mut error2: i32 = 0;
 
-    let mut coords_to_be_filled = Vec::new();
-
     let mut y = my0;
     for x in mx0..mx1 {
         if steep {
-            coords_to_be_filled.push((y as u32, x as u32));
+            color_position(y, x, width, height, frame, rgba);
         } else {
-            coords_to_be_filled.push((x as u32, y as u32));
+            color_position(x, y, width, height, frame, rgba);
         }
         error2 += error_increment2;
         if error2 > dx {
@@ -58,19 +58,6 @@ pub fn line(
             error2 -= dx * 2;
         }
     }
-
-    println!("{}", coords_to_be_filled.len());
-
-    // draw the coordinates
-    /* for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
-        let x = i as i32 % width;
-        let y = i as i32 / width;
-
-        let distance = math::distance(center_x, center_y, x as f64, y as f64);
-        if (distance <= radius) && (distance >= (radius - outline_width)) {
-            pixel.copy_from_slice(rgba);
-        }
-    } */
 }
 
 #[warn(missing_docs)]
@@ -143,6 +130,7 @@ pub fn circle(
     outline_width: f64,
     rgba: &[u8; 4],
 ) {
+    let height = frame.len() as i32 / 4 / width;
     let rough_minimum_y = (center_y - radius) as i32;
     let rough_minimum_x = (center_x - radius) as i32;
     let rough_maximum_y = (center_y + radius) as i32;
@@ -152,11 +140,7 @@ pub fn circle(
         for x in rough_minimum_x..=rough_maximum_x {
             let distance = math::distance(center_x, center_y, x as f64, y as f64);
             if (distance <= radius) && (distance >= (radius - outline_width)) {
-                let index = (((y * width) + (x)) * 4) as usize;
-                frame[index] = rgba[0];
-                frame[index + 1] = rgba[1];
-                frame[index + 2] = rgba[2];
-                frame[index + 3] = rgba[3];
+                color_position(x, y, width, height, frame, rgba);
             }
         }
     }
@@ -220,6 +204,7 @@ pub fn circle_filled(
     radius: f64,
     rgba: &[u8; 4],
 ) {
+    let height = frame.len() as i32 / 4 / width;
     let rough_minimum_y = (center_y - radius) as i32;
     let rough_minimum_x = (center_x - radius) as i32;
     let rough_maximum_y = (center_y + radius) as i32;
@@ -229,11 +214,7 @@ pub fn circle_filled(
         for x in rough_minimum_x..=rough_maximum_x {
             let distance = math::distance(center_x, center_y, x as f64, y as f64);
             if distance <= radius {
-                let index = (((y * width) + (x)) * 4) as usize;
-                frame[index] = rgba[0];
-                frame[index + 1] = rgba[1];
-                frame[index + 2] = rgba[2];
-                frame[index + 3] = rgba[3];
+                color_position(x, y, width, height, frame, rgba);
             }
         }
     }
@@ -338,4 +319,18 @@ pub fn rect(buffer: &mut [u8]) {
 #[warn(missing_docs)]
 pub fn rect_filled(buffer: &mut [u8]) {
     unimplemented!()
+}
+
+#[inline]
+fn get_starting_pixel_index(x: i32, y: i32, width: i32) -> usize {
+    (((y * width) + (x)) * 4) as usize
+}
+
+fn color_position(x: i32, y: i32, width: i32, height: i32, frame: &mut [u8], rgba: &[u8]) {
+    if (x < 0) || (y < 0) || (x >= width) || (y >= height) {
+        return;
+    }
+    let index = get_starting_pixel_index(x, y, width);
+    let pixel = &mut frame[index..index + 4];
+    pixel.copy_from_slice(rgba);
 }

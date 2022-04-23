@@ -36,9 +36,37 @@ fn main() -> Result<(), Box<dyn Error>> {
         WIDTH,
         200.0,
         200.0,
-        50.0,
-        1.5,
+        120.0,
+        1.0,
         &[255, 255, 255, 255],
+    );
+
+    pixels_primitives::circle_filled(
+        pixels.get_frame(),
+        WIDTH,
+        500.0,
+        400.0,
+        180.0,
+        &[255, 0, 0, 255],
+    );
+
+    pixels_primitives::circle_filled(
+        pixels.get_frame(),
+        WIDTH,
+        100.0,
+        690.0,
+        150.0,
+        &[0, 255, 0, 255],
+    );
+
+    pixels_primitives::circle(
+        pixels.get_frame(),
+        WIDTH,
+        820.0,
+        50.0,
+        250.0,
+        5.0,
+        &[0, 0, 255, 255],
     );
     /* pixels_primitives::line(
         pixels.get_frame(),
