@@ -4,17 +4,65 @@ use std::mem;
 
 mod math;
 
-//#[warn(missing_docs)]
+/// Draws a 2d line to a frame of pixels used in the [pixels](https://docs.rs/pixels/latest/pixels/) crate.
+///
+/// # Example
+///
+/// ```no_run
+/// use pixels::{Pixels, SurfaceTexture};
+/// use winit::dpi::LogicalSize;
+/// use winit::event_loop::{EventLoop};
+/// use std::error::Error;
+/// use winit::window::WindowBuilder;
+///
+/// const WIDTH: i32 = 800;
+/// const HEIGHT: i32 = 800;
+///
+/// fn main() -> Result<(), Box<dyn Error>> {
+///     let event_loop = EventLoop::new();
+///     let window = {
+///     let size = LogicalSize::new(WIDTH as f64, HEIGHT as f64);
+///     WindowBuilder::new()
+///         .with_title("Circle Example")
+///         .with_inner_size(size)
+///         .with_min_inner_size(size)
+///         .build(&event_loop)
+///         .unwrap()
+///     };
+///
+///     let mut pixels = {
+///         let window_size = window.inner_size();
+///         let surface_texture = SurfaceTexture::new(window_size.width, window_size.height, &window);
+///         Pixels::new(WIDTH as u32, HEIGHT as u32, surface_texture)?
+///     };
+///
+///     pixels_primitives::line(
+///         pixels.get_frame(),
+///         WIDTH,
+///         200.0,
+///         100.0,
+///         700.0,
+///         300.0,
+///         &[255, 255, 255, 255],
+///     );
+///
+///     // Run your event loop here!
+///
+///     Ok(())
+/// }
+///
+/// ```
+#[warn(missing_docs)]
 pub fn line(
     frame: &mut [u8],
-    width: i32,
+    canvas_width: i32,
     starting_x: f64,
     starting_y: f64,
     ending_x: f64,
     ending_y: f64,
     rgba: &[u8; 4],
 ) {
-    let height = frame.len() as i32 / 4 / width;
+    let canvas_height = frame.len() as i32 / 4 / canvas_width;
 
     // Clone our immutable values into mutable values.
     let (mut mx0, mut my0, mut mx1, mut my1) = (
@@ -27,7 +75,7 @@ pub fn line(
     // Checks to see if range is bigger than the domain.
     let steep = (mx0 - mx1).abs() < (my0 - my1).abs();
 
-    // If the line is steep, we transpose the line (by swapping our Xs and Ys, we will undo it later) .
+    // If the line is steep, we transpose the line (by swapping our Xs and Ys, we will undo it later).
     if steep {
         mem::swap(&mut mx0, &mut my0);
         mem::swap(&mut mx1, &mut my1);
@@ -48,9 +96,9 @@ pub fn line(
     let mut y = my0;
     for x in mx0..mx1 {
         if steep {
-            color_position(y, x, width, height, frame, rgba);
+            color_position(y, x, canvas_width, canvas_height, frame, rgba);
         } else {
-            color_position(x, y, width, height, frame, rgba);
+            color_position(x, y, canvas_width, canvas_height, frame, rgba);
         }
         error2 += error_increment2;
         if error2 > dx {
@@ -123,14 +171,14 @@ pub fn triangle_filled(buffer: &mut [u8]) {
 #[warn(missing_docs)]
 pub fn circle(
     frame: &mut [u8],
-    width: i32,
+    canvas_width: i32,
     center_x: f64,
     center_y: f64,
     radius: f64,
     outline_width: f64,
     rgba: &[u8; 4],
 ) {
-    let height = frame.len() as i32 / 4 / width;
+    let canvas_height = frame.len() as i32 / 4 / canvas_width;
     let rough_minimum_y = (center_y - radius) as i32;
     let rough_minimum_x = (center_x - radius) as i32;
     let rough_maximum_y = (center_y + radius) as i32;
@@ -140,7 +188,7 @@ pub fn circle(
         for x in rough_minimum_x..=rough_maximum_x {
             let distance = math::distance(center_x, center_y, x as f64, y as f64);
             if (distance <= radius) && (distance >= (radius - outline_width)) {
-                color_position(x, y, width, height, frame, rgba);
+                color_position(x, y, canvas_width, canvas_height, frame, rgba);
             }
         }
     }
@@ -198,13 +246,13 @@ pub fn circle(
 #[warn(missing_docs)]
 pub fn circle_filled(
     frame: &mut [u8],
-    width: i32,
+    canvas_width: i32,
     center_x: f64,
     center_y: f64,
     radius: f64,
     rgba: &[u8; 4],
 ) {
-    let height = frame.len() as i32 / 4 / width;
+    let canvas_height = frame.len() as i32 / 4 / canvas_width;
     let rough_minimum_y = (center_y - radius) as i32;
     let rough_minimum_x = (center_x - radius) as i32;
     let rough_maximum_y = (center_y + radius) as i32;
@@ -214,7 +262,7 @@ pub fn circle_filled(
         for x in rough_minimum_x..=rough_maximum_x {
             let distance = math::distance(center_x, center_y, x as f64, y as f64);
             if distance <= radius {
-                color_position(x, y, width, height, frame, rgba);
+                color_position(x, y, canvas_width, canvas_height, frame, rgba);
             }
         }
     }
@@ -223,7 +271,7 @@ pub fn circle_filled(
 //#[warn(missing_docs)]
 pub fn square(
     frame: &mut [u8],
-    width: i32,
+    canvas_width: i32,
     center_x: f64,
     center_y: f64,
     side_length: f64,
@@ -283,7 +331,7 @@ pub fn square(
 #[warn(missing_docs)]
 pub fn square_filled(
     frame: &mut [u8],
-    width: i32,
+    canvas_width: i32,
     center_x: f64,
     center_y: f64,
     side_length: f64,
@@ -295,8 +343,8 @@ pub fn square_filled(
     let rough_maximum_x = (center_x + (side_length / 2.0)) as i32;
 
     for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
-        let x = i as i32 % width;
-        let y = i as i32 / width;
+        let x = i as i32 % canvas_width;
+        let y = i as i32 / canvas_width;
 
         // dont calculate distance if its not within the bounding box
         if (x < rough_minimum_x)
@@ -322,15 +370,23 @@ pub fn rect_filled(buffer: &mut [u8]) {
 }
 
 #[inline]
-fn get_starting_pixel_index(x: i32, y: i32, width: i32) -> usize {
-    (((y * width) + (x)) * 4) as usize
+fn get_starting_pixel_index(x: i32, y: i32, canvas_width: i32) -> usize {
+    (((y * canvas_width) + (x)) * 4) as usize
 }
 
-fn color_position(x: i32, y: i32, width: i32, height: i32, frame: &mut [u8], rgba: &[u8]) {
-    if (x < 0) || (y < 0) || (x >= width) || (y >= height) {
+#[inline]
+fn color_position(
+    x: i32,
+    y: i32,
+    canvas_width: i32,
+    canvas_height: i32,
+    frame: &mut [u8],
+    rgba: &[u8],
+) {
+    if (x < 0) || (y < 0) || (x >= canvas_width) || (y >= canvas_height) {
         return;
     }
-    let index = get_starting_pixel_index(x, y, width);
+    let index = get_starting_pixel_index(x, y, canvas_width);
     let pixel = &mut frame[index..index + 4];
     pixel.copy_from_slice(rgba);
 }

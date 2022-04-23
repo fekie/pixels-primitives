@@ -30,43 +30,44 @@ fn main() -> Result<(), Box<dyn Error>> {
         Pixels::new(WIDTH as u32, HEIGHT as u32, surface_texture)?
     };
 
-    // this will run once
-    pixels_primitives::circle(
-        pixels.get_frame(),
-        WIDTH,
-        200.0,
-        200.0,
-        120.0,
-        1.0,
-        &[255, 255, 255, 255],
-    );
-
-    pixels_primitives::circle_filled(
-        pixels.get_frame(),
-        WIDTH,
-        500.0,
-        400.0,
-        180.0,
-        &[255, 0, 0, 255],
-    );
-
-    pixels_primitives::circle_filled(
+    pixels_primitives::line(
         pixels.get_frame(),
         WIDTH,
         100.0,
-        690.0,
-        150.0,
+        700.0,
+        200.0,
+        300.0,
+        &[0, 0, 255, 255],
+    );
+
+    pixels_primitives::line(
+        pixels.get_frame(),
+        WIDTH,
+        700.0,
+        750.0,
+        50.0,
+        400.0,
         &[0, 255, 0, 255],
     );
 
-    pixels_primitives::circle(
+    pixels_primitives::line(
         pixels.get_frame(),
         WIDTH,
-        820.0,
-        50.0,
-        250.0,
-        5.0,
-        &[0, 0, 255, 255],
+        -50.0,
+        100.0,
+        900.0,
+        300.0,
+        &[255, 0, 0, 255],
+    );
+
+    pixels_primitives::line(
+        pixels.get_frame(),
+        WIDTH,
+        300.0,
+        680.0,
+        600.0,
+        100.0,
+        &[255, 255, 255, 255],
     );
 
     event_loop.run(move |event, _, control_flow| {
