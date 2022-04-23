@@ -26,3 +26,9 @@ Screenshot of [draw_circles](https://github.com/Chloe-Woahie/pixels-primitives/b
 Screenshot of [draw_triangles](https://github.com/Chloe-Woahie/pixels-primitives/blob/main/examples/draw_triangles/src/main.rs)
 
 ![image](https://user-images.githubusercontent.com/68732833/164948552-e590edf4-ab7a-47e9-9ad2-633e1eb0d38f.png)
+
+# Contributing
+Some of these function can still be optimized. PRs are welcome!
+
+# License
+MIT License
