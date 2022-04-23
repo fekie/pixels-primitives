@@ -3,13 +3,13 @@ use pixels::{Pixels, SurfaceTexture};
 use pixels_primitives;
 use std::error::Error;
 use winit::dpi::LogicalSize;
-use winit::event::{Event, VirtualKeyCode};
+use winit::event::Event;
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::WindowBuilder;
 use winit_input_helper::WinitInputHelper;
 
-const WIDTH: u32 = 800;
-const HEIGHT: u32 = 800;
+const WIDTH: i32 = 800;
+const HEIGHT: i32 = 800;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let event_loop = EventLoop::new();
@@ -27,11 +27,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut pixels = {
         let window_size = window.inner_size();
         let surface_texture = SurfaceTexture::new(window_size.width, window_size.height, &window);
-        Pixels::new(WIDTH, HEIGHT, surface_texture)?
+        Pixels::new(WIDTH as u32, HEIGHT as u32, surface_texture)?
     };
 
     // this will run once
-    /* pixels_primitives::circle(
+    pixels_primitives::circle(
         pixels.get_frame(),
         WIDTH,
         200.0,
@@ -39,15 +39,16 @@ fn main() -> Result<(), Box<dyn Error>> {
         50.0,
         1.5,
         &[255, 255, 255, 255],
-    ); */
-    pixels_primitives::circle_filled(
+    );
+    /* pixels_primitives::line(
         pixels.get_frame(),
         WIDTH,
         200.0,
         200.0,
-        50.0,
+        100.0,
+        70.0,
         &[255, 255, 255, 255],
-    );
+    ); */
 
     event_loop.run(move |event, _, control_flow| {
         // Draw the current frame
