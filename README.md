@@ -9,7 +9,7 @@ Documentation can be found [here](https://docs.rs/pixels_primitives/0.1.1/pixels
 ### Cargo
 In your dependencies section inside `Cargo.toml` add
 ```toml
-pixels_primitives = "0.1.0"
+pixels_primitives = "0.1.1"
 ```
 
 ### Code Examples
